@@ -15,6 +15,7 @@ App = {
         petTemplate.find(".pet-age").text(data[i].age);
         petTemplate.find(".pet-location").text(data[i].location);
         petTemplate.find(".btn-adopt").attr("data-id", data[i].id);
+        petTemplate.find(".btn-info").attr("data-id", data[i].id);
 
         petsRow.append(petTemplate.html());
       }
@@ -68,6 +69,7 @@ App = {
 
   bindEvents: function () {
     $(document).on("click", ".btn-adopt", App.handleAdopt);
+    //$(document).on("click", ".btn-info", App.handleShowPetInfo);
   },
 
   markAdopted: function () {
@@ -80,6 +82,7 @@ App = {
         return adoptionInstance.getAdopters.call();
       })
       .then(function (adopters) {
+        console.log("adopters", adopters);
         for (i = 0; i < adopters.length; i++) {
           if (adopters[i] !== "0x0000000000000000000000000000000000000000") {
             $(".panel-pet")
@@ -96,9 +99,12 @@ App = {
   },
 
   handleAdopt: function (event) {
+
+    console.log("event", event);
     event.preventDefault();
 
     var petId = parseInt($(event.target).data("id"));
+    console.log("petId", petId);
 
     var adoptionInstance;
 
@@ -124,6 +130,28 @@ App = {
         });
     });
   },
+
+  handleShowPetInfo: function (event) {
+    console.log("event", event);
+    event.preventDefault();
+
+    var petId = parseInt($(event.target).data("id"));
+    console.log("petId", petId);
+    
+    $.getJSON("../pets.json", function (data) {
+      var petsRow = $("#petsRows");
+      var petTemplate = $("#myModal");
+
+      //for (i = 0; i < data.length; i++) {
+        petTemplate.find(".modal-title").text(data[petId].name);
+        petTemplate.find(".modal-body").text(data[petId].breed);
+        //petTemplate.find(".btn-info").attr("data-id", data[i].id);
+
+        petsRow.empty();
+        petsRow.append(petTemplate.html());
+      //}
+    });
+  }
 };
 
 $(function () {
@@ -131,3 +159,4 @@ $(function () {
     App.init();
   });
 });
+
