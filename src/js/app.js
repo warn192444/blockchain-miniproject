@@ -1,6 +1,7 @@
 App = {
   web3Provider: null,
   contracts: {},
+  owner: false,
 
   init: async function () {
     // Load pets.
@@ -14,7 +15,7 @@ App = {
         petTemplate.find(".pet-breed").text(data[i].breed);
         petTemplate.find(".pet-age").text(data[i].age);
         petTemplate.find(".pet-location").text(data[i].location);
-        petTemplate.find(".btn-adopt").attr("data-id", data[i].id);
+        //petTemplate.find(".btn-adopt").attr("data-id", data[i].id);
         petTemplate.find(".btn-info").attr("data-id", data[i].id);
 
         petsRow.append(petTemplate.html());
@@ -87,7 +88,7 @@ App = {
           if (adopters[i] !== "0x0000000000000000000000000000000000000000") {
             $(".panel-pet")
               .eq(i)
-              .find("button")
+              .find("btn-adopt")
               .text("Success")
               .attr("disabled", true);
           }
@@ -99,6 +100,7 @@ App = {
   },
 
   handleAdopt: function (event) {
+    
 
     console.log("event", event);
     event.preventDefault();
@@ -123,6 +125,7 @@ App = {
           return adoptionInstance.adopt(petId, { from: account });
         })
         .then(function (result) {
+          console.log("result", result);
           return App.markAdopted();
         })
         .catch(function (err) {
@@ -132,6 +135,7 @@ App = {
   },
 
   handleShowPetInfo: function (event) {
+
     console.log("event", event);
     event.preventDefault();
 
@@ -139,18 +143,33 @@ App = {
     console.log("petId", petId);
     
     $.getJSON("../pets.json", function (data) {
+      console.log("data", data);
       var petsRow = $("#petsRows");
       var petTemplate = $("#myModal");
 
       //for (i = 0; i < data.length; i++) {
         petTemplate.find(".modal-title").text(data[petId].name);
-        petTemplate.find(".modal-body").text(data[petId].breed);
-        //petTemplate.find(".btn-info").attr("data-id", data[i].id);
+        petTemplate.find(".pet-breed").text(data[petId].breed);
+        petTemplate.find(".pet-age").text(data[petId].age);
+        petTemplate.find(".pet-location").text(data[petId].location);
+        petTemplate.find("img").attr("src", data[petId].picture);
+        petTemplate.find(".btn-transaction").text(App.owner ? "Transfer" : "Adopt")
+          .attr("data-id", data[petId].id)
+          .attr("class", App.owner ? " btn-danger btn btn-transaction center-block" : "btn btn-success btn-transaction center-block");//FIXME:
+        
 
         petsRow.empty();
         petsRow.append(petTemplate.html());
       //}
     });
+  },
+
+  handleCapybara: function (event) {//FIXME:
+    App.owner = !App.owner;
+    console.log("OWNER", App.owner)
+
+    $(".btn-transaction").text(App.owner ? "Transfer" : "Adopt")
+    $(".btn-transaction").attr("class", App.owner ? " btn-danger btn btn-transaction center-block" : "btn btn-success btn-transaction center-block");
   }
 };
 

@@ -1,7 +1,63 @@
 .footer-card {
-    display: flex;
-    flex: 1;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal {
+  text-align: center;
+  padding: 0 !important;
+}
+
+.modal:before {
+  content: "";
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-right: -4px;
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.content-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.upper-modal {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+}
+
+.upper-modal .pet-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 80%;
+  padding-left: 10%;
+  justify-content: center;
+
+}
+
+.lower-modal {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.table {
+  table-layout: auto;
+  width: 100%;
+}
+
+th, td{
+  text-align: center;
 }
