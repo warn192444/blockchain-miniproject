@@ -22,16 +22,28 @@ contract Adoption {
   //transfer pet
   function transfer(uint petId, address _target) public {
     require(petId >= 0 && petId <= 15);
-    require(adopters[petId] == msg.sender);
+    require(adopters[petId] == msg.sender, "capybara");
 
     adopters[petId] = _target;
     petHistory[petId].push(_target);
   }
 
-  //transfer pet
+  //get pet owners history
   function getPetHistory(uint petId) public view returns (address[] memory) {
     require(petId >= 0 && petId <= 15);
 
     return petHistory[petId];
+  }
+
+  //check pet owner
+  function checkOwnerPet(uint petId) public view returns (bool) {
+    require(petId >= 0 && petId <= 15);
+    //if(adopters[petId] == msg.sender) {
+    //    return true;
+    //} else {
+    //    return false;
+    //}
+
+    return (adopters[petId] == msg.sender) ? true : false;
   }
 }

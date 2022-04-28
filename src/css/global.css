@@ -58,6 +58,10 @@
   width: 100%;
 }
 
+.modal-foot-bottom {
+  display: flex;
+}
+
 th, td{
   text-align: center;
 }
