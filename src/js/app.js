@@ -16,7 +16,6 @@ App = {
         petTemplate.find(".pet-breed").text(data[i].breed);
         petTemplate.find(".pet-age").text(data[i].age);
         petTemplate.find(".pet-location").text(data[i].location);
-        //petTemplate.find(".btn-adopt").attr("data-id", data[i].id);
         petTemplate.find(".btn-info").attr("data-id", data[i].id);
 
         petsRow.append(petTemplate.html());
@@ -71,7 +70,6 @@ App = {
 
   bindEvents: function () {
     $(document).on("click", ".btn-adopt", App.handleAdopt);
-    //$(document).on("click", ".btn-info", App.handleShowPetInfo);
   },
 
   markAdopted: function () {
@@ -102,12 +100,9 @@ App = {
 
   handleAdopt: function (event) {
     
-
-    console.log("event", event);
     event.preventDefault();
 
     var petId = parseInt($(event.target).data("id"));
-    console.log("petId", petId);
 
     var adoptionInstance;
 
@@ -137,29 +132,28 @@ App = {
 
   handleShowPetInfo: function (event) {
 
-    console.log("event", event);
     event.preventDefault();
 
     var petId = parseInt($(event.target).data("id"));
-    console.log("petId", petId);
-
     
-    //TODO: check pet owner
+    //check pet owner
+    web3.eth.getAccounts(function (error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+
+      var account = accounts[0];
     App.contracts.Adoption.deployed()
         .then(function (instance) {
           adoptionInstance = instance;
 
           // Execute adopt as a transaction by sending account
-          return adoptionInstance.checkOwnerPet(petId);
+          return adoptionInstance.getAdopters({ from: account });
         })
         .then(async function (result) {
-          console.log("result", result);
-          console.log("OWNER", App.owner);
           App.owner = result;
 
           const history = await adoptionInstance.getPetHistory(petId);
-
-          console.log("history", history);
           
           $.getJSON("../pets.json", function (data) {
             console.log("data", data);
@@ -167,25 +161,22 @@ App = {
             var petTemplate = $("#myModal");
             var row = $("#tbl_row");
       
-            //for (i = 0; i < data.length; i++) {
               petTemplate.find(".modal-title").text(data[petId].name);
               petTemplate.find(".pet-breed").text(data[petId].breed);
               petTemplate.find(".pet-age").text(data[petId].age);
               petTemplate.find(".pet-location").text(data[petId].location);
               petTemplate.find("img").attr("src", data[petId].picture);
               petTemplate.find(".btn-transaction").text(
-                App.owner ? "Transfer" : "Adopt")
+                App.owner[petId] == account ? "Transfer" : "Adopt")
                 .attr("data-id", data[petId].id)
                 .attr("class", 
-                App.owner ? " btn-danger btn btn-transaction center-block" : "btn btn-success btn-transaction center-block")
-                .attr("disabled", history.length != 0 && !App.owner);
-             
+                App.owner[petId] == account ? " btn-danger btn btn-transaction center-block" : "btn btn-success btn-transaction center-block")
+                .attr("disabled", history.length != 0 && !(App.owner[petId] == account));
       
               petsRow.empty();
               petsRow.append(petTemplate.html());
 
               history.map((row, i) => {
-                //petTemplate.find("tbody").appendChild("<tr>").appendChild("<td>");
 
                 var newRow = document.getElementById('tbl_id').insertRow();
 
@@ -202,12 +193,11 @@ App = {
         .catch(function (err) {
           console.log("error", err.message);
         });
+      });
   },
 
   handleCapybara: function (event) {//FIXME:
-    console.log("OWNER", App.owner);
     var petId = parseInt($(event.target).data("id"));
-    console.log("petId", petId);
 
     //TODO: check transfer or adopt
     if(App.owner){ // transfer
@@ -218,17 +208,14 @@ App = {
   
         var account = accounts[0];
         
-        console.log("g", account);
       App.contracts.Adoption.deployed()
           .then(function (instance) {
             adoptionInstance = instance;
   
-            console.log("dd", App.targetAddress);
             // Execute adopt as a transaction by sending account
             return adoptionInstance.transfer(petId, App.targetAddress, { from: account });
           })
           .then(function (result) {
-            console.log("result", result);
             $('#petsRows').modal('hide');
           })
           .catch(function (err) {
@@ -251,7 +238,6 @@ App = {
             return adoptionInstance.adopt(petId, { from: account });
           })
           .then(function (result) {
-            console.log("result", result);
             $('#petsRows').modal('hide');
             return App.markAdopted();
           })
@@ -261,8 +247,6 @@ App = {
       });
     }
 
-    // $(".btn-transaction").text(App.owner ? "Transfer" : "Adopt")
-    // $(".btn-transaction").attr("class", App.owner ? " btn-danger btn btn-transaction center-block" : "btn btn-success btn-transaction center-block");
   },
 
   handleGetTarget: function (event) {

@@ -34,16 +34,4 @@ contract Adoption {
 
     return petHistory[petId];
   }
-
-  //check pet owner
-  function checkOwnerPet(uint petId) public view returns (bool) {
-    require(petId >= 0 && petId <= 15);
-    //if(adopters[petId] == msg.sender) {
-    //    return true;
-    //} else {
-    //    return false;
-    //}
-
-    return (adopters[petId] == msg.sender) ? true : false;
-  }
 }
